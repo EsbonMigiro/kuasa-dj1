@@ -1,7 +1,15 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+import uuid
+import os
 
+def profile_image_file_path(instance, filename):
+    """Generate file path for new recipe image."""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+
+    return os.path.join('media', 'profiles', filename)
 
 class User(AbstractUser):
     username = models.CharField(unique=True, max_length=255)
@@ -9,8 +17,8 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
     alternative_email = models.EmailField(blank=True, null=True, unique=True)
-    registration_no = models.CharField(max_length=20)
-    phone_number = models.CharField(max_length=15)
+    registration_no = models.CharField(max_length=20, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     year_of_study = models.IntegerField(null=True, blank=True)
     linkedin = models.URLField(
         blank=True,
@@ -36,7 +44,7 @@ class User(AbstractUser):
         blank=True,
         null=True)
     profile_image = models.ImageField(
-        upload_to='media/profile_images/', null=True, blank=True)
+        upload_to=profile_image_file_path, null=True, blank=True)
     is_member = models.BooleanField(default=False, verbose_name="Is Member")
     readonly_fields = ['last_login']
     bio = models.TextField(max_length=120, blank=True, null=True)

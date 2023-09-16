@@ -12,13 +12,9 @@ class CustomUserAdmin(UserAdmin):
         'is_staff',
         'is_superuser',
         'is_member',
-        'linkedin',
-        'alternative_email',
-        'registration_no',
         'phone_number',
         'year_of_study',
-        'leadership_role',
-        'last_login')
+        'leadership_role')
     list_filter = ('is_staff', 'is_superuser', 'is_member', 'leadership_role')
 
     fieldsets = ((None,
