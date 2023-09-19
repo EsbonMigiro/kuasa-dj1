@@ -56,6 +56,7 @@ class UserListSerializer(serializers.ModelSerializer):
             'email',
             'alternative_email',
             'registration_no',
+            'profile_image',
             'phone_number',
             'year_of_study',
             'leadership_role',

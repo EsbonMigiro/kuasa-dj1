@@ -7,7 +7,7 @@ from .serializers import (
     UserListSerializer,
     LeadershipUserSerializer,
     UserProfileUpdateSerializer,
-    PasswordChangeSerializer,
+    PasswordChangeSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.parsers import (
@@ -17,7 +17,7 @@ from django.db.models import Case, Value, When, IntegerField
 
 
 class UserLoginView(TokenObtainPairView):
-    username_field = 'email'
+    pass
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -43,7 +43,7 @@ class LeadershipUserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('first_name', 'last_name')
     serializer_class = UserListSerializer
     permission_classes = [IsAuthenticated]
 
