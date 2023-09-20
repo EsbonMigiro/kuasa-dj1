@@ -6,6 +6,14 @@ name = "pypi"
 [packages]
 django = "*"
 dj-database-url = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+gunicorn = "*"
+psycopg2 = "==2.9.7"
+python-decouple = "*"
+django-heroku = "*"
+django-cors-headers = "*"
+Pillow = "*"
 
 [dev-packages]
 
