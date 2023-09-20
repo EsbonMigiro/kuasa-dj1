@@ -48,6 +48,7 @@ class User(AbstractUser):
     is_member = models.BooleanField(default=False, verbose_name="Is Member")
     readonly_fields = ['last_login']
     bio = models.TextField(max_length=120, blank=True, null=True)
+    is_corporate_member = models.BooleanField(default=False, verbose_name="Is Corporate Member")
 
     def __str__(self):
         return self.username

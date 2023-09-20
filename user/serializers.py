@@ -62,11 +62,13 @@ class UserListSerializer(serializers.ModelSerializer):
             'leadership_role',
             'linkedin',
             'is_member',
+            'is_corporate_member',
             'bio')
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     is_member = serializers.ReadOnlyField()
+    is_corporate_member = serializers.ReadOnlyField()
 
     class Meta:
         model = User
@@ -83,6 +85,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             'linkedin',
             'profile_image',
             'is_member',
+            'is_corporate_member',
             'bio')
 
     def update(self, instance, validated_data):

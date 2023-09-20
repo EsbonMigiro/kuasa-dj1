@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
         'is_staff',
         'is_superuser',
         'is_member',
-        'phone_number',
+        'is_corporate_member',
         'year_of_study',
         'leadership_role')
     list_filter = ('is_staff', 'is_superuser', 'is_member', 'leadership_role')
@@ -36,6 +36,7 @@ class CustomUserAdmin(UserAdmin):
                               'is_staff',
                               'is_superuser',
                               'is_member',
+                              'is_corporate_member',
                               'groups',
                               'user_permissions')}),
                  ('Important dates',
@@ -57,6 +58,7 @@ class CustomUserAdmin(UserAdmin):
                                   'is_staff',
                                   'is_superuser',
                                   'is_member',
+                                  'is_corporate_member',
                                   'linkedin',
                                   'profile_image',
                                   'alternative_email',
