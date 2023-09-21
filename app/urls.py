@@ -7,7 +7,7 @@ urlpatterns = [
 ]
 
 # Configure Admin Titles
-admin.site.site_header = "Kuasa Admins Page"
+admin.site.site_header = "Kuasa Admins"
 admin.site.site_title = "KUASA"
 admin.site.site_url = "https://kuasa.live"
 admin.site.index_title = "Welcome"
