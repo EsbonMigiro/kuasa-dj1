@@ -21,12 +21,14 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 2. **Clone Your Fork**:
    - Clone the forked repository to your local machine using the following command:
+
      ```
      git clone https://github.com/your-username/kuasa-dj.git
      ```
 
 3. **Create a Virtual Environment**:
    - Navigate to the project directory and create a virtual environment:
+
      ```
      cd kuasa-dj
      pipenv install
@@ -34,12 +36,14 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 4. **Activate the Virtual Environment**:
    - Activate the virtual environment:
+
      ```
      pipenv shell
      ```
 
 5. **Install Project Dependencies**:
    - Install project dependencies by running the following command:
+
      ```
      pip install -r requirements.txt
      ```
@@ -47,6 +51,7 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 6. **Set Up Environment Variables**:
    - Create a `.env` file in the project root and add your environment variables. You can use the provided `.env` as a reference. Ensure that `DEBUG=True` in the `.env` file to enable debugging mode.
    - Copy and paste the following in your `.env` file.
+
     ```
     DEBUG=True
     ```
@@ -56,6 +61,7 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 8. **Apply Migrations**:
    - Apply database migrations:
+
      ```
      python3 manage.py makemigrations
      python3 manage.py migrate
@@ -63,6 +69,7 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 9. **Populate the Database with Dummy Data**:
    - To have the same dummy data as the project's development environment, you can run the following command:
+
      ```
      python3 manage.py loaddata datadump.json
      ```
@@ -77,12 +84,14 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 10. **Run the Development Server**:
     - Start the Django development server:
+
       ```
       python3 manage.py runserver
       ```
 
 11. **Create a Branch**:
     - Create a new branch for your contribution:
+
       ```
       git checkout -b feature/your-feature-name
       ```
@@ -92,11 +101,13 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 13. **Linting and Formatting**:
     - Before committing your changes, run linting with Flake8 to ensure code quality:
+
       ```
       flake8 .
       ```
 
     - To fix linting errors automatically, you can use autopep8. Run the following command for each file with linting errors (replace `<filename>` with the file name):
+
       ```
       autopep8 --in-place --aggressive --aggressive <filename>
       ```
@@ -105,12 +116,14 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
 
 14. **Commit Your Changes**:
     - Commit your changes with a clear and descriptive commit message:
+
       ```
       git commit -m "Add feature: your feature description"
       ```
 
 15. **Push to Your Fork**:
     - Push your changes to your GitHub fork:
+
       ```
       git push origin feature/your-feature-name
       ```
