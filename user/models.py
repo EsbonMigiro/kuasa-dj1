@@ -9,7 +9,7 @@ def profile_image_file_path(instance, filename):
     ext = os.path.splitext(filename)[1]
     filename = f'{uuid.uuid4()}{ext}'
 
-    return os.path.join('media', 'profiles', filename)
+    return os.path.join(filename)
 
 class User(AbstractUser):
     username = models.CharField(unique=True, max_length=255)

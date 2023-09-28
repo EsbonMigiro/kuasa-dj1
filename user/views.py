@@ -116,6 +116,7 @@ class UserProfileImageView(viewsets.ViewSet):
     def update_profile_image(self, user, image):
         user.profile_image = image
         user.save()
+        return user.profile_image.url
 
     def upload_image(self, request):
         serializer = UserProfileUpdateSerializer(
@@ -128,7 +129,8 @@ class UserProfileImageView(viewsets.ViewSet):
                 self.update_profile_image(request.user, image)
 
             return Response(
-                {'detail': 'Profile image updated successfully.'},
+                {'profile_image': request.user.profile_image.url,
+                    'detail': 'Profile image updated successfully.'},
                 status=status.HTTP_200_OK)
         else:
             return Response(

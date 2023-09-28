@@ -143,10 +143,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# MEDIA_URL = ''
-# MEDIA_ROOT = os.path.join(BASE_DIR, '')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (user-uploaded content like images)
+MEDIA_URL = f"https://kuasamedia.blob.core.windows.net/images/"
+
+DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = config('AZURE_CONTAINER')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
