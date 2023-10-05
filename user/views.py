@@ -36,24 +36,24 @@ class UserLoginView(TokenObtainPairView):
                 relative_link = reverse("verify-email")
                 refresh = RefreshToken.for_user(user)
                 token = str(refresh.access_token)
-                absurl = f"http://{current_site.domain}{relative_link}?token={token}"
+                absurl = f"http://{current_site.domain}{relative_link}?token={token}"  # noqa: E501
 
                 email_body = (
-                    "Hi "
-                    + user.first_name
-                    + " "
-                    + user.last_name
-                    + ", \n"
-                    + " \n Click the link below to verify your email \n"
-                    + absurl
-                    + "\n"
-                    + "\n Your username is: "
-                    + user.username
-                    + " in case you forgot. \n \n"
-                    + "You received this message because you signed up for kuasa website. \n"
-                    + "KUASA \n"
-                    + "Kenyatta University Aerospace Engineering Students Association."
-                )
+                    "Hi " +
+                    user.first_name +
+                    " " +
+                    user.last_name +
+                    ", \n" +
+                    " \n Click the link below to verify your email \n" +
+                    absurl +
+                    "\n" +
+                    "\n Your username is: " +
+                    user.username +
+                    " in case you forgot. \n \n" +
+                    "You received this message because you signed up for "
+                    + "kuasa website. \n" +
+                    "KUASA \n" +
+                    "Kenyatta University Aerospace Engineering Students Association.")  # noqa: E501
 
                 data = {
                     "email_body": email_body,
@@ -92,21 +92,21 @@ class UserRegistrationView(generics.CreateAPIView):
         absurl = f"http://{current_site.domain}{relative_link}?token={token}"
 
         email_body = (
-            "Hi "
-            + user.first_name
-            + " "
-            + user.last_name
-            + ", \n"
-            + " \n Click the link below to verify your email \n"
-            + absurl
-            + "\n"
-            + "\n You are username is: "
-            + user.username
-            + " incase you forgot. \n \n"
-            + "You received this message because you sign up for kuasa website. \n"
-            + "KUASA \n"
-            + "Kenyatta University Aerospace Engineering Students Association."
-        )
+            "Hi " +
+            user.first_name +
+            " " +
+            user.last_name +
+            ", \n" +
+            " \n Click the link below to verify your email \n" +
+            absurl +
+            "\n" +
+            "\n You are username is: " +
+            user.username +
+            " incase you forgot. \n \n" +
+            "You received this message because you "
+            + "sign up for kuasa website. \n" +
+            "KUASA \n" +
+            "Kenyatta University Aerospace Engineering Students Association.")
         data = {
             "email_body": email_body,
             "to_email": user.email,
@@ -125,7 +125,8 @@ class VerifyEmailView(TemplateView):
         context = {}
         token = request.GET.get("token")
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
+            payload = jwt.decode(
+                token, settings.SECRET_KEY, algorithms="HS256")
             user = User.objects.get(id=payload["user_id"])
             if not user.is_verified:
                 user.is_verified = True
@@ -134,12 +135,11 @@ class VerifyEmailView(TemplateView):
             else:
                 context["verification_status"] = "Already verified"
 
-        except jwt.ExpiredSignatureError as identifier:
+        except jwt.ExpiredSignatureError as identifier:  # noqa: F841
             context["verification_status"] = "Activation Expired"
-        except jwt.exceptions.DecodeError as identifier:
+        except jwt.exceptions.DecodeError as identifier:  # noqa: F841
             context["verification_status"] = "Invalid token"
         return render(request, self.template_name, context)
-
 
 
 class LeadershipUserViewSet(viewsets.ReadOnlyModelViewSet):
