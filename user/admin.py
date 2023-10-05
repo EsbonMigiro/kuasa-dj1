@@ -7,8 +7,8 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         'username',
         'email',
-        'first_name',
         'is_verified',
+        'first_name',
         'last_name',
         'is_staff',
         'is_superuser',
