@@ -7,7 +7,8 @@ from .serializers import (
     UserListSerializer,
     LeadershipUserSerializer,
     UserProfileUpdateSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer,
+    EmailVerificationSerializer,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.parsers import (
@@ -15,14 +16,130 @@ from rest_framework.parsers import (
 )
 from django.db.models import Case, Value, When, IntegerField
 
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+import jwt
+from django.conf import settings
+from .utils import Util
+from django.views.generic import TemplateView
+from django.shortcuts import render
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserLoginView(TokenObtainPairView):
-    pass
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == status.HTTP_200_OK:
+            user = User.objects.get(username=request.data["username"])
+            if not user.is_verified:
+                current_site = get_current_site(request)
+                relative_link = reverse("verify-email")
+                refresh = RefreshToken.for_user(user)
+                token = str(refresh.access_token)
+                absurl = f"http://{current_site.domain}{relative_link}?token={token}"
+
+                email_body = (
+                    "Hi "
+                    + user.first_name
+                    + " "
+                    + user.last_name
+                    + ", \n"
+                    + " \n Click the link below to verify your email \n"
+                    + absurl
+                    + "\n"
+                    + "\n Your username is: "
+                    + user.username
+                    + " in case you forgot. \n \n"
+                    + "You received this message because you signed up for kuasa website. \n"
+                    + "KUASA \n"
+                    + "Kenyatta University Aerospace Engineering Students Association."
+                )
+
+                data = {
+                    "email_body": email_body,
+                    "to_email": user.email,
+                    "email_subject": "Verify your email",
+                }
+
+                Util.send_email(data)
+
+                return Response(
+                    {"message": "A verification email has been sent."},
+                    status=status.HTTP_200_OK,
+                )
+
+        return response
 
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
+
+    def post(self, request):
+        user = request.data
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        user_data = serializer.data
+        user = User.objects.get(email=user_data["email"])
+        refresh = RefreshToken.for_user(user)
+
+        # Create a verification token and send it via email
+        token = str(refresh.access_token)
+        current_site = get_current_site(request)
+        relative_link = reverse("verify-email")
+        absurl = f"http://{current_site.domain}{relative_link}?token={token}"
+
+        email_body = (
+            "Hi "
+            + user.first_name
+            + " "
+            + user.last_name
+            + ", \n"
+            + " \n Click the link below to verify your email \n"
+            + absurl
+            + "\n"
+            + "\n You are username is: "
+            + user.username
+            + " incase you forgot. \n \n"
+            + "You received this message because you sign up for kuasa website. \n"
+            + "KUASA \n"
+            + "Kenyatta University Aerospace Engineering Students Association."
+        )
+        data = {
+            "email_body": email_body,
+            "to_email": user.email,
+            "email_subject": "Verify your email",
+        }
+
+        Util.send_email(data)
+        return Response(user_data, status=status.HTTP_201_CREATED)
+
+
+class VerifyEmailView(TemplateView):
+    serializer_class = EmailVerificationSerializer
+    template_name = "user/verification_response.html"
+
+    def get(self, request):
+        context = {}
+        token = request.GET.get("token")
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
+            user = User.objects.get(id=payload["user_id"])
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+                context["verification_status"] = "Successfully activated"
+            else:
+                context["verification_status"] = "Already verified"
+
+        except jwt.ExpiredSignatureError as identifier:
+            context["verification_status"] = "Activation Expired"
+        except jwt.exceptions.DecodeError as identifier:
+            context["verification_status"] = "Invalid token"
+        return render(request, self.template_name, context)
+
 
 
 class LeadershipUserViewSet(viewsets.ReadOnlyModelViewSet):

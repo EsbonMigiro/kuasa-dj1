@@ -16,6 +16,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
+    is_verified = models.BooleanField(default=False)
     alternative_email = models.EmailField(blank=True, null=True, unique=True)
     registration_no = models.CharField(max_length=20, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)

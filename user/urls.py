@@ -8,7 +8,8 @@ from .views import (
     UserListView,
     UserProfileView,
     UserDetailView,
-    UserProfileImageView
+    UserProfileImageView,
+    VerifyEmailView
 )
 
 
@@ -39,6 +40,7 @@ urlpatterns = [
     path('profile/change_password/',
          UserProfileView.as_view({'post': 'change_password'}),
          name='change_password'),
+    path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
 ]
 
 # Serve media files during development
