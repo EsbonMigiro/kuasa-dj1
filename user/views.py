@@ -36,7 +36,7 @@ class UserLoginView(TokenObtainPairView):
                 relative_link = reverse("verify-email")
                 refresh = RefreshToken.for_user(user)
                 token = str(refresh.access_token)
-                absurl = f"http://{current_site.domain}{relative_link}?token={token}"  # noqa: E501
+                absurl = f"https://{current_site.domain}{relative_link}?token={token}"  # noqa: E501
 
                 email_body = (
                     "Hi " +
@@ -89,7 +89,7 @@ class UserRegistrationView(generics.CreateAPIView):
         token = str(refresh.access_token)
         current_site = get_current_site(request)
         relative_link = reverse("verify-email")
-        absurl = f"http://{current_site.domain}{relative_link}?token={token}"
+        absurl = f"https://{current_site.domain}{relative_link}?token={token}"
 
         email_body = (
             "Hi " +
