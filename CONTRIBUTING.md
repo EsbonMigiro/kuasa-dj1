@@ -79,8 +79,8 @@ To contribute effectively to the KUASA Django Rest Framework Backend project, yo
      | Username  | Password    |
      |-----------|-------------|
      | K-1000    | 12345678    |
-     | K-1001    | 12345678    |
-     | K-2026    | 12345678    |
+     | K-1234    | 12345678    |
+
 
 10. **Run the Development Server**:
     - Start the Django development server:
