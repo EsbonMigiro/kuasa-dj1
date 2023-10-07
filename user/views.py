@@ -24,6 +24,9 @@ from .utils import Util
 from django.views.generic import TemplateView
 from django.shortcuts import render
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
 
 
 class UserLoginView(TokenObtainPairView):
@@ -38,28 +41,26 @@ class UserLoginView(TokenObtainPairView):
                 token = str(refresh.access_token)
                 absurl = f"https://{current_site.domain}{relative_link}?token={token}"  # noqa: E501
 
-                email_body = (
-                    "Hi " +
-                    user.first_name +
-                    " " +
-                    user.last_name +
-                    ", \n" +
-                    " \n Click the link below to verify your email \n" +
-                    absurl +
-                    "\n" +
-                    "\n Your username is: " +
-                    user.username +
-                    " in case you forgot. \n \n" +
-                    "You received this message because you signed up for "
-                    + "kuasa website. \n" +
-                    "KUASA \n" +
-                    "Kenyatta University Aerospace Engineering Students Association.")  # noqa: E501
+                email_body = render_to_string(
+                    "email_verification.html",
+                    {
+                        "user": user,
+                        "absurl": absurl,
+                    },
+                )
 
-                data = {
-                    "email_body": email_body,
-                    "to_email": user.email,
-                    "email_subject": "Verify your email",
-                }
+                email_subject = "Verify your email"
+                to_email = user.email
+                email_plain_text_body = strip_tags(email_body)
+
+                data = EmailMultiAlternatives(
+                    subject=email_subject,
+                    body=email_plain_text_body,
+                    from_email=None,
+                    to=[to_email],
+                )
+
+                data.attach_alternative(email_body, "text/html")
 
                 Util.send_email(data)
 
@@ -91,27 +92,25 @@ class UserRegistrationView(generics.CreateAPIView):
         relative_link = reverse("verify-email")
         absurl = f"https://{current_site.domain}{relative_link}?token={token}"
 
-        email_body = (
-            "Hi " +
-            user.first_name +
-            " " +
-            user.last_name +
-            ", \n" +
-            " \n Click the link below to verify your email \n" +
-            absurl +
-            "\n" +
-            "\n You are username is: " +
-            user.username +
-            " incase you forgot. \n \n" +
-            "You received this message because you "
-            + "sign up for kuasa website. \n" +
-            "KUASA \n" +
-            "Kenyatta University Aerospace Engineering Students Association.")
-        data = {
-            "email_body": email_body,
-            "to_email": user.email,
-            "email_subject": "Verify your email",
-        }
+        email_body = render_to_string(
+                    "email_verification.html",
+                    {
+                        "user": user,
+                        "absurl": absurl,
+                    },
+                )
+
+        email_subject = "Verify your email"
+        to_email = user.email
+        email_plain_text_body = strip_tags(email_body)
+        data = EmailMultiAlternatives(
+            subject=email_subject,
+            body=email_plain_text_body,
+            from_email=None,
+            to=[to_email],
+        )
+
+        data.attach_alternative(email_body, "text/html")
 
         Util.send_email(data)
         return Response(user_data, status=status.HTTP_201_CREATED)

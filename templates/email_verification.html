@@ -1,0 +1,32 @@
+{% extends "user/base.html" %}
+
+{% block title %}Email Verification{% endblock %}
+
+{% block content %}
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <div style="background-color: #e9e9e9b1; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h1 style="color: #33bbcf; margin-bottom: 20px;">Email Verification</h1>
+
+            <p>Hello <span style="font-weight: bold;">{{ user.first_name }} {{ user.last_name }}</span>,</p>
+
+            <p>Click the button below to verify your email:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ absurl }}" style="display: inline-block; padding: 10px 20px; background-color: #33bbcf; color: black; text-decoration: none; border-radius: 5px; cursor: pointer;">
+                    <button style="border: none; background: none; padding: 0; margin: 0; font: inherit; cursor: pointer; font-weight: bold;">Verify your email</button>
+                </a>
+            </div>
+
+            <p>Your username is: <span style="font-weight: bold;">{{ user.username }}</span> in case you forgot.</p>
+
+            <br />
+
+            <p style="color: red; font-size: 10px;">This mail is not monitored, please do not reply.</p>
+            <p style="color: #888; font-size: 10px;">You received this message because you signed up for the Kuasa website.</p>
+            <p style="color: #888; font-size: 10px;">Didn't sign up? Let us know <a href="https://kuasa.live/contact">here</a>.</p>
+            <p style="color: #888; font-size: 10px;">KUASA</p>
+            <p style="color: #888; font-size: 10px;">Kenyatta University Aerospace Engineering Students Association.</p>
+        </div>
+        </div>
+    </div>
+{% endblock %}
