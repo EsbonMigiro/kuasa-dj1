@@ -9,7 +9,10 @@ from .views import (
     UserProfileView,
     UserDetailView,
     UserProfileImageView,
-    VerifyEmailView
+    VerifyEmailView,
+    RequestPasswordResetEmail,
+    PasswordTokenCheckAPI,
+    SetNewPasswordAPIView
 )
 
 
@@ -41,6 +44,21 @@ urlpatterns = [
          UserProfileView.as_view({'post': 'change_password'}),
          name='change_password'),
     path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
+    path(
+        "forgot-password/",
+        RequestPasswordResetEmail.as_view(),
+        name="forgot-password",
+    ),
+    path(
+        "password-reset/<uidb64>/<token>/",
+        PasswordTokenCheckAPI.as_view(),
+        name="password-reset-confirm",
+    ),
+    path(
+        "password-reset-complete",
+        SetNewPasswordAPIView.as_view(),
+        name="password-reset-complete",
+    ),
 ]
 
 # Serve media files during development

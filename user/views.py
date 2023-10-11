@@ -9,6 +9,9 @@ from .serializers import (
     UserProfileUpdateSerializer,
     PasswordChangeSerializer,
     EmailVerificationSerializer,
+    ForgotPasswordSerializer,
+    SetNewPasswordSerializer
+
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.parsers import (
@@ -27,6 +30,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import smart_bytes
 
 
 class UserLoginView(TokenObtainPairView):
@@ -93,12 +99,12 @@ class UserRegistrationView(generics.CreateAPIView):
         absurl = f"https://{current_site.domain}{relative_link}?token={token}"
 
         email_body = render_to_string(
-                    "email_verification.html",
-                    {
-                        "user": user,
-                        "absurl": absurl,
-                    },
-                )
+            "email_verification.html",
+            {
+                "user": user,
+                "absurl": absurl,
+            },
+        )
 
         email_subject = "Verify your email"
         to_email = user.email
@@ -264,3 +270,87 @@ class UserProfileImageView(viewsets.ViewSet):
         else:
             return Response({'detail': 'No profile image to remove.'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class RequestPasswordResetEmail(generics.GenericAPIView):
+    serializer_class = ForgotPasswordSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)  # noqa: F841
+
+        email = request.data.get("email", "")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"detail":
+                 "No user account associated with this email address."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+        token = PasswordResetTokenGenerator().make_token(user)
+        # current_site = get_current_site(request=request).domain
+        current_site = "kuasa.live"
+        relativeLink = reverse(
+            "password-reset-confirm", kwargs={"uidb64": uidb64, "token": token}
+        )
+
+        absurl = "https://" + current_site + relativeLink
+
+        email_subject = "Password Reset Request"
+        email_body = render_to_string(
+            "password_reset_email.html", {"absurl": absurl, "user": user}
+        )
+        email_plain_text_body = strip_tags(email_body)
+        to_email = user.email
+
+        data = EmailMultiAlternatives(
+            subject=email_subject,
+            body=email_plain_text_body,
+            from_email=None,
+            to=[to_email],
+        )
+
+        data.attach_alternative(email_body, "text/html")
+
+        Util.send_email(data)
+
+        return Response(
+            {"detail": "Check your email for a link to reset your password."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class PasswordTokenCheckAPI(generics.GenericAPIView):
+    serializer_class = SetNewPasswordSerializer
+
+    def get(self, request, uidb64, token):
+        try:
+            user_id = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=user_id)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return Response({"error": "Invalid token."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response({"error": "Invalid user or token."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"message": "Token and user are valid."}, status=status.HTTP_200_OK
+        )
+
+
+class SetNewPasswordAPIView(generics.GenericAPIView):
+    serializer_class = SetNewPasswordSerializer
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(
+            {"success": True, "message": "Password reset success"},
+            status=status.HTTP_200_OK,
+        )
