@@ -33,11 +33,23 @@ from django.utils.html import strip_tags
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_bytes
+from django.core.cache import cache
 
 
 class UserLoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
+        user = User.objects.get(username=request.data["username"])
+        cache_key = f"verification_email_requested_{user.email}"
+
+        if not user.is_verified:
+            if cache.get(cache_key):
+                return Response(
+                    {"message": "You must verify your email before logging in."},  # noqa E501
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         response = super().post(request, *args, **kwargs)
+
         if response.status_code == status.HTTP_200_OK:
             user = User.objects.get(username=request.data["username"])
             if not user.is_verified:
@@ -45,7 +57,7 @@ class UserLoginView(TokenObtainPairView):
                 relative_link = reverse("verify-email")
                 refresh = RefreshToken.for_user(user)
                 token = str(refresh.access_token)
-                absurl = f"https://{current_site.domain}{relative_link}?token={token}"  # noqa: E501
+                absurl = f"https://{current_site.domain}{relative_link}?token={token}"  # noqa E501
 
                 email_body = render_to_string(
                     "email_verification.html",
@@ -70,6 +82,8 @@ class UserLoginView(TokenObtainPairView):
 
                 Util.send_email(data)
 
+                cache.set(cache_key, True, timeout=60 * 60)
+
                 return Response(
                     {"message": "A verification email has been sent."},
                     status=status.HTTP_200_OK,
@@ -92,7 +106,6 @@ class UserRegistrationView(generics.CreateAPIView):
         user = User.objects.get(email=user_data["email"])
         refresh = RefreshToken.for_user(user)
 
-        # Create a verification token and send it via email
         token = str(refresh.access_token)
         current_site = get_current_site(request)
         relative_link = reverse("verify-email")
@@ -151,7 +164,6 @@ class LeadershipUserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LeadershipUserSerializer
 
     def get_queryset(self):
-        # Get the queryset and order it based on the custom order
         queryset = User.objects.exclude(leadership_role__isnull=True).order_by(
             Case(
                 *[When(leadership_role=choice[0], then=Value(order)) for order,
@@ -276,7 +288,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ForgotPasswordSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)  # noqa: F841
+        serializer = self.serializer_class(data=request.data)  # noqa F841
 
         email = request.data.get("email", "")
 
@@ -284,8 +296,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response(
-                {"detail":
-                 "No user account associated with this email address."},
+                {"detail": "No user account associated with this email address."},  # noqa E501
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -306,6 +317,15 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         email_plain_text_body = strip_tags(email_body)
         to_email = user.email
 
+        cache_key = f"password_reset_email_requested_{user.email}"
+        if cache.get(cache_key):
+            return Response(
+                {
+                    "detail": "You have already requested a password reset email. Please check your email."  # noqa E501
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         data = EmailMultiAlternatives(
             subject=email_subject,
             body=email_plain_text_body,
@@ -316,6 +336,8 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         data.attach_alternative(email_body, "text/html")
 
         Util.send_email(data)
+
+        cache.set(cache_key, True, 3600)
 
         return Response(
             {"detail": "Check your email for a link to reset your password."},
