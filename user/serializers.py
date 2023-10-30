@@ -99,6 +99,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             'linkedin',
             'profile_image',
             'is_member',
+            'is_staff',
             'is_corporate_member',
             'bio')
 
