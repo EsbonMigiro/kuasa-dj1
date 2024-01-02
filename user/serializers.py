@@ -15,20 +15,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'username',
-            'password',
-            'confirm_password',
-            'first_name',
-            'last_name',
-            'email',
-            'alternative_email',
-            'registration_no',
-            'phone_number',
-            'year_of_study')
+            "username",
+            "password",
+            "confirm_password",
+            "first_name",
+            "last_name",
+            "email",
+            "alternative_email",
+            "registration_no",
+            "phone_number",
+            "year_of_study",
+        )
 
     def create(self, validated_data):
-        confirm_password = validated_data.pop('confirm_password', None)
-        password = validated_data.get('password')
+        confirm_password = validated_data.pop("confirm_password", None)
+        password = validated_data.get("password")
 
         if password != confirm_password:
             raise serializers.ValidationError("Passwords do not match.")
@@ -49,12 +50,13 @@ class LeadershipUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'pk',
-            'first_name',
-            'last_name',
-            'leadership_role',
-            'linkedin',
-            'profile_image')
+            "pk",
+            "first_name",
+            "last_name",
+            "leadership_role",
+            "linkedin",
+            "profile_image",
+        )
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -63,21 +65,22 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'pk',
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'alternative_email',
-            'registration_no',
-            'profile_image',
-            'phone_number',
-            'year_of_study',
-            'leadership_role',
-            'linkedin',
-            'is_member',
-            'is_corporate_member',
-            'bio')
+            "pk",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "alternative_email",
+            "registration_no",
+            "profile_image",
+            "phone_number",
+            "year_of_study",
+            "leadership_role",
+            "linkedin",
+            "is_member",
+            "is_corporate_member",
+            "bio",
+        )
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
@@ -87,26 +90,28 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'alternative_email',
-            'registration_no',
-            'phone_number',
-            'year_of_study',
-            'leadership_role',
-            'linkedin',
-            'profile_image',
-            'is_member',
-            'is_staff',
-            'is_corporate_member',
-            'bio')
+            "pk",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "alternative_email",
+            "registration_no",
+            "phone_number",
+            "year_of_study",
+            "leadership_role",
+            "linkedin",
+            "profile_image",
+            "is_member",
+            "is_staff",
+            "is_corporate_member",
+            "bio",
+        )
 
     def update(self, instance, validated_data):
-        if 'password' in validated_data:
-            validated_data['password'] = make_password(
-                validated_data['password'])
+        if "password" in validated_data:
+            validated_data["password"] = make_password(
+                validated_data["password"])
 
         instance = super().update(instance, validated_data)
         return instance
