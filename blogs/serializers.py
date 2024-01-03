@@ -60,7 +60,6 @@ class BlogSerializer(serializers.ModelSerializer):
             "is_project",
             "created_at",
             "slug",
-            "author",
         )
 
 

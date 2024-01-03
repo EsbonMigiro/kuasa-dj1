@@ -22,6 +22,7 @@ class Blog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     slug = AutoSlugField(populate_from="title", unique=True)
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title

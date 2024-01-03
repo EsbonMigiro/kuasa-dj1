@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     BlogListCreateView,
     BlogDetailView,
+    BlogPageView,
     CommentListCreateView,
     CommentDetailView,
     CommentReplyListCreateView,
@@ -27,6 +28,11 @@ urlpatterns = [
         UpvoteDetailView.as_view(),
         name="blog-upvote-delete",
     ),
+    path(
+        "blogs/<slug:slug>/views/",
+        BlogPageView.as_view(),
+        name="blog-page-views",  # noqa: E501
+    ),  # noqa: E501
     path(
         "comment/", CommentListCreateView.as_view(), name="comment-list-create"
     ),  # noqa: E501
